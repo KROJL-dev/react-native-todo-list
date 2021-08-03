@@ -8,7 +8,7 @@ import { NativeBaseProvider } from 'native-base';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-import LoginPage from './containers/LoginPage';
+import AuthorizationPage from './containers/AuthorizationScreen/AuthorizationPage';
 
 import { useStore } from './store/store';
 
@@ -31,11 +31,14 @@ const App: React.FC<{}> = () => {
   return (
     <NavigationContainer>
       <NativeBaseProvider>
-        <Stack.Navigator >
+        <Stack.Navigator>
           {userStore.isUser ? (
             <Stack.Screen name="Home" component={HomeScreen} />
           ) : (
-            <Stack.Screen name="Login" component={LoginPage} />
+            <Stack.Screen
+              name="Authorization"
+              component={AuthorizationPage}
+            />
           )}
         </Stack.Navigator>
       </NativeBaseProvider>

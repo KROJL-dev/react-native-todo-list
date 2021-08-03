@@ -8,29 +8,42 @@ import _ from 'lodash';
 export class UserStore {
   rootStore: RootStore;
 
-  @observable users: IUser[] = [{ firstName: 'Den', lastName: 'Kek' }];
+  @observable users: IUser[] = [{ firstName: 'den', lastName: 'kek' }];
   @observable isUser?: boolean;
   constructor(rootStore: RootStore) {
-    //переделать на локалСторэйдж
-
     this.rootStore = rootStore;
     makeAutoObservable(this);
   }
 
-  checkUser = async (firstName: string, lastName: string) => {
-    console.log('checkUser', lastName, firstName);
-    let newUsers = _.cloneDeep(this.users);
-    newUsers.map((user) => {
-      if(user.firstName === firstName && user.lastName === lastName){
-        this.isUser = true
-        return
-      }
-    });
-    this.isUser = false 
-    setTimeout(()=>{this.isUser = undefined}, 4000)
+  login = async (firstName: string, lastName: string) => {
+    if (this.checkUser(firstName, lastName)) {
+      this.isUser = true
+    }
+    else{
+      this.isUser = false
+      setTimeout(()=>{this.isUser = undefined}, 4000)
+    }
   };
   @action
   registration = (firstName: string, lastName: string) => {
     this.users = [...this.users, { firstName, lastName }];
+  };
+
+  @action
+  checkUser = (firstName: string, lastName: string) => {
+    let newUsers = _.cloneDeep(this.users);
+    let loginSucces = false;
+    newUsers.map((user) => {
+      if (
+        user.firstName === firstName.toLocaleLowerCase() &&
+        user.lastName === lastName.toLocaleLowerCase()
+      ) {
+        loginSucces = true;
+        return;
+        console.log('return ');
+      }
+      console.log(user, 'user');
+    });
+    return loginSucces;
   };
 }
