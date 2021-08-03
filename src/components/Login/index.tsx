@@ -13,7 +13,7 @@ import { IUser } from '../../models/user';
 interface IProps {
   handleLoading: Function;
 }
-const LoginPage: React.FC<IProps> = ({ handleLoading }) => {
+const Login: React.FC<IProps> = ({ handleLoading }) => {
   const {
     handleSubmit,
     control,
@@ -79,4 +79,4 @@ const LoginPage: React.FC<IProps> = ({ handleLoading }) => {
     </Center>
   );
 };
-export default observer(LoginPage);
+export default observer(Login);

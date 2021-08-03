@@ -4,7 +4,7 @@ import { Center, Input, Button, Stack, Text, View } from 'native-base';
 import { useForm, Controller } from 'react-hook-form';
 
 import { useStore } from '../../store/store';
-
+import { IUser } from '../../models/user';
 interface IProps {
   handleLoading: Function;
 }
@@ -14,13 +14,23 @@ const Registration: React.FC<IProps> = ({ handleLoading }) => {
   const { userStore } = useStore();
 
   const {
+    handleSubmit,
     control,
     formState: { errors },
   } = useForm();
 
-  const handleSubmitRegistration = () => {
-      
-  }
+  const handleSubmitRegistration = (data: IUser) => {
+       
+      handleLoading(true);
+
+      setTimeout(
+        () =>
+          userStore.registration(data.firstName, data.lastName).then(() => {
+            handleLoading(false);
+          }),
+        1000
+      );
+  };
   return (
     <Center w="100%" px={8}>
       <Stack space={4} w="100%">
@@ -60,7 +70,9 @@ const Registration: React.FC<IProps> = ({ handleLoading }) => {
           name="lastName"
           defaultValue=""
         />
+
         {errors.lastName && <Text>This is required.</Text>}
+        <Button onPress={handleSubmit(handleSubmitRegistration)}>Submit</Button>
       </Stack>
     </Center>
   );

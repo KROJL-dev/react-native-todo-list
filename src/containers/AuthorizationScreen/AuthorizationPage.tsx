@@ -27,7 +27,7 @@ import Registration from '../../components/Registration';
 const LoginPage: React.FC<{}> = () => {
   const swipeAnimationLogin = useRef(new Animated.Value(0)).current;
   const swipeAnimationRegistration = useRef(new Animated.Value(-300)).current;
-  const swipeAnimationLoading = useRef(new Animated.Value(100)).current;
+  const swipeAnimationLoading = useRef(new Animated.Value(500)).current;
   const swipeAnimationError = useRef(new Animated.Value(700)).current;
   const { userStore } = useStore();
 
@@ -45,25 +45,26 @@ const LoginPage: React.FC<{}> = () => {
   }, [isRegistration]);
 
   useEffect(() => {
-    console.log(userStore.isUser, 'userStore.isUser');
-    console.log('loading', loading);
+    
     if (loading) {
       toggleStartedAnimation(350, swipeAnimationLogin, 200);
       toggleStartedAnimation(500, swipeAnimationLoading, 200);
+      toggleStartedAnimation(-300, swipeAnimationRegistration);
     } else {
       toggleStartedAnimation(0, swipeAnimationLogin);
       toggleStartedAnimation(700, swipeAnimationLoading);
+      
     }
   }, [loading]);
 
-  useEffect(()=>{
-    if(!userStore.isUser && userStore.isUser !==undefined){
+  useEffect(() => {
+    if (!userStore.isUser && userStore.isUser !== undefined) {
       toggleStartedAnimation(500, swipeAnimationError);
-    }
-    else{
+    } else {
       toggleStartedAnimation(700, swipeAnimationError);
     }
-  }, [userStore.isUser])
+  }, [userStore.isUser]);
+
   const toggleStartedAnimation = (
     value: number,
     ref: Animated.Value,

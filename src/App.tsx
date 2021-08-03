@@ -32,7 +32,7 @@ const App: React.FC<{}> = () => {
     <NavigationContainer>
       <NativeBaseProvider>
         <Stack.Navigator>
-          {userStore.isUser ? (
+          {userStore.isCanGoHomePage ? (
             <Stack.Screen name="Home" component={HomeScreen} />
           ) : (
             <Stack.Screen

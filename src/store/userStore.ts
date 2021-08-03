@@ -10,6 +10,7 @@ export class UserStore {
 
   @observable users: IUser[] = [{ firstName: 'den', lastName: 'kek' }];
   @observable isUser?: boolean;
+  @observable isCanGoHomePage: boolean = false
   constructor(rootStore: RootStore) {
     this.rootStore = rootStore;
     makeAutoObservable(this);
@@ -18,6 +19,7 @@ export class UserStore {
   login = async (firstName: string, lastName: string) => {
     if (this.checkUser(firstName, lastName)) {
       this.isUser = true
+      this.isCanGoHomePage = true;
     }
     else{
       this.isUser = false
@@ -25,8 +27,9 @@ export class UserStore {
     }
   };
   @action
-  registration = (firstName: string, lastName: string) => {
+  registration = async(firstName: string, lastName: string) => {
     this.users = [...this.users, { firstName, lastName }];
+    this.isCanGoHomePage = true
   };
 
   @action
