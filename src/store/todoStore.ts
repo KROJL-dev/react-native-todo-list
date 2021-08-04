@@ -2,6 +2,8 @@ import { action, makeAutoObservable, observable } from 'mobx';
 import { ITodo, Categories } from '../models/todo';
 import { RootStore } from './store';
 
+import AsyncStorage from '@react-native-community/async-storage';
+
 import generateId from '../utils/generateId'
 import dayjs from 'dayjs';
 
@@ -17,11 +19,21 @@ export class TodoStore {
   @observable todoList: ITodo[] = [];
   constructor(rootStore: RootStore) {
     this.rootStore = rootStore;
+
+    (async () => {
+      
+      let todoList = await AsyncStorage.getItem('todoList');
+      if (todoList !== null) {
+        let newTodoList = JSON.parse(todoList) as unknown as ITodo[];
+        this.todoList = newTodoList
+      }
+    })();
+
     makeAutoObservable(this);
   }
 
   @action
-  addTodo = ({
+  addTodo = async({
     todoTitle,
     todoDescription,
     todoCategory,
@@ -39,6 +51,7 @@ export class TodoStore {
         deadline: dayjs(todoDeadline).format('DD/MM HH:mm:ss'),
       },
     ];
+    await AsyncStorage.setItem('todoList', JSON.stringify(this.todoList));
   };
 
   @action

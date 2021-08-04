@@ -9,11 +9,13 @@ import {
   Container,
   Stack,
   Button,
+  Text,
 } from 'native-base';
 
 import { Categories } from '../../models/todo';
 
 import { useStore } from '../../store/store';
+import { StyleSheet } from 'react-native';
 
 const AddTodoForm: React.FC<{}> = () => {
   const [category, setCategory] = useState<Categories>(Categories.home);
@@ -87,6 +89,7 @@ const AddTodoForm: React.FC<{}> = () => {
           <Select.Item label="Home" value="home" />
           <Select.Item label="Study" value="study" />
         </Select>
+        <Text style={styles.deadlineDescr}>Select deadline</Text>
         <DatePicker
           date={date}
           onDateChange={setDate}
@@ -98,7 +101,7 @@ const AddTodoForm: React.FC<{}> = () => {
               todoTitle: title,
               todoDescription: description,
               todoCategory: category,
-              todoDeadline:date
+              todoDeadline: date,
             })
           }
         >
@@ -109,3 +112,10 @@ const AddTodoForm: React.FC<{}> = () => {
   );
 };
 export default AddTodoForm;
+
+const styles = StyleSheet.create({
+  deadlineDescr: {
+    position: 'absolute',
+    top:205
+  },
+});
