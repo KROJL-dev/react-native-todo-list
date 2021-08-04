@@ -49,7 +49,6 @@ const HomePage: React.FC<{}> = () => {
         <Animated.View
           style={{
             transform: [{ translateX: swiperAnimationAddForm }],
-
             ...styles.addForm,
           }}
         >

@@ -1,10 +1,12 @@
-import React, { useEffect, useState } from 'react';
-import { Text, View, StyleSheet } from 'react-native';
+import React, { useEffect, useState, useRef } from 'react';
+import { Text, View, StyleSheet, Animated } from 'react-native';
 import { Image, Center, Button, Flex } from 'native-base';
 
 import { ITodo } from '../../models/todo';
 
 import { useStore } from '../../store/store';
+
+import { toggleStartedAnimation } from '../../utils/toggleStartedAnimation';
 
 const WORKICON = 'https://image.flaticon.com/icons/png/512/3281/3281289.png';
 const HOMEICON = 'https://image.flaticon.com/icons/png/512/619/619032.png';
@@ -19,8 +21,9 @@ interface IProps {
 const TodoCard: React.FC<IProps> = ({ todo }) => {
   const [currentURLImage, setCurrentURLImage] = useState('');
 
-  const { todoStore } = useStore() 
+  const { todoStore } = useStore();
 
+  const animationDelete = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
     if (todo.category !== undefined) {
@@ -37,30 +40,36 @@ const TodoCard: React.FC<IProps> = ({ todo }) => {
       }
     }
   }, [todo]);
-
+  const handleDeleteTodo = async () => {
+    toggleStartedAnimation(0, animationDelete);
+    await new Promise((r) => setTimeout(r, 300));
+    todoStore.deleteTodo(todo.id);
+    
+  };
   return (
-    <View style={styles.card}>
-      <Button
-        style={styles.deleteIcon}
-        onPress={() => {
-          todoStore.deleteTodo(todo.id)
-        }}
-      >
-        <Image source={{ uri: CLOSEICON }} alt="x" style={styles.icon} />
-      </Button>
-      <Center>
-        {currentURLImage !== '' && (
-          <Image
-            source={{
-              uri: currentURLImage,
-            }}
-            alt="Alternate Text"
-            size={'xl'}
-          />
-        )}
-        <Text style={styles.icon}>{todo.title}</Text>
-      </Center>
-    </View>
+    <Animated.View
+      style={{
+        transform: [{ scale: animationDelete }],
+      }}
+    >
+      <View style={styles.card}>
+        <Button style={styles.deleteIcon} onPress={handleDeleteTodo}>
+          <Image source={{ uri: CLOSEICON }} alt="x" style={styles.icon} />
+        </Button>
+        <Center>
+          {currentURLImage !== '' && (
+            <Image
+              source={{
+                uri: currentURLImage,
+              }}
+              alt="Alternate Text"
+              size={'xl'}
+            />
+          )}
+          <Text style={styles.icon}>{todo.title}</Text>
+        </Center>
+      </View>
+    </Animated.View>
   );
 };
 export default TodoCard;
