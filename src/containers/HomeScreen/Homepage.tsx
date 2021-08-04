@@ -1,17 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { StyleSheet, Text, Animated } from 'react-native';
 
-import {
-  Container,
-  Button,
-  Spinner,
-  HStack,
-  Heading,
-  Alert,
-  View,
-  Center,
-  Flex,
-} from 'native-base';
+import { toggleStartedAnimation } from '../../utils/toggleStartedAnimation';
+
+import { Button, Heading, View, Center, Flex } from 'native-base';
 
 import { observer } from 'mobx-react';
 
@@ -19,14 +11,14 @@ import { useStore } from '../../store/store';
 
 import TodoList from '../../components/TodoList/index';
 import AddTodoForm from '../../components/AddTodoForm/index';
- 
+
 const HomePage: React.FC<{}> = () => {
   const swiperAnimationTodoList = useRef(new Animated.Value(0)).current;
   const swiperAnimationAddForm = useRef(new Animated.Value(400)).current;
 
   const [isAddTodo, setIsAddTodo] = useState<boolean>(false);
 
-  const { userStore } = useStore();
+  const { userStore, todoStore } = useStore();
 
   useEffect(() => {
     if (isAddTodo) {
@@ -38,18 +30,11 @@ const HomePage: React.FC<{}> = () => {
     }
   }, [isAddTodo]);
 
-  const toggleStartedAnimation = (
-    value: number,
-    ref: Animated.Value,
-    duration: number = 200
-  ) => {
-    Animated.timing(ref, {
-      toValue: value,
-      duration: duration,
-      easing: (v) => v,
-      useNativeDriver: true,
-    }).start();
-  };
+  useEffect(() => {
+    if (todoStore.todoList.length === 0) {
+      setIsAddTodo(true);
+    }
+  }, [todoStore.todoList.length]);
 
   return (
     <View style={styles.container} w="100%">
@@ -63,15 +48,6 @@ const HomePage: React.FC<{}> = () => {
       <Center>
         <Animated.View
           style={{
-            transform: [{ translateX: swiperAnimationTodoList }],
-            position: 'absolute',
-            top: 0,
-          }}
-        >
-          <TodoList />
-        </Animated.View>
-        <Animated.View
-          style={{
             transform: [{ translateX: swiperAnimationAddForm }],
 
             ...styles.addForm,
@@ -79,17 +55,28 @@ const HomePage: React.FC<{}> = () => {
         >
           <AddTodoForm />
         </Animated.View>
+        <Animated.View
+          style={{
+            transform: [{ translateX: swiperAnimationTodoList }],
+            position: 'absolute',
+            top: 0,
+          }}
+        >
+          {todoStore.todoList.length > 0 ? <TodoList /> : null}
+        </Animated.View>
       </Center>
       <View style={styles.btnForm}>
         <Flex direction="column" alignItems="center">
-          <Button
-            style={styles.buttonAddTodo}
-            onPress={() => {
-              setIsAddTodo(!isAddTodo);
-            }}
-          >
-            {isAddTodo ? 'todo list' : 'add todo'}
-          </Button>
+          {todoStore.todoList.length > 0 && (
+            <Button
+              style={styles.buttonAddTodo}
+              onPress={() => {
+                setIsAddTodo(!isAddTodo);
+              }}
+            >
+              {isAddTodo ? 'todo list' : 'add todo'}
+            </Button>
+          )}
           <Text style={(styles.text, styles.textFilters)}>Filters</Text>
           <Flex w="92.5%" direction="row" justifyContent="space-between">
             <Button
@@ -137,6 +124,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 0,
     width: 400,
-    left:15
+    left: 15,
   },
 });

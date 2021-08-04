@@ -37,6 +37,7 @@ export class TodoStore {
 
   @action
   deleteTodo = (id: string) => {
-    this.todoList.filter((todo) => todo.id !== id);
+    console.log("todoDelete")
+    this.todoList = this.todoList.filter((todo) => todo.id !== id);
   };
 }
