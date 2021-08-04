@@ -44,7 +44,12 @@ const HomePage: React.FC<{}> = () => {
           '' +
           userStore.currentUser?.firstName.slice(1)}
       </Heading>
-      <Text style={styles.text}>The nearest tasks</Text>
+      {!isAddTodo && (
+        <Text style={styles.text}>
+          The nearest task{' '}
+          {todoStore.todoList.length > 0 && ':' + todoStore.todoList.length}
+        </Text>
+      )}
       <Center>
         <Animated.View
           style={{
@@ -64,8 +69,8 @@ const HomePage: React.FC<{}> = () => {
           {todoStore.todoList.length > 0 ? <TodoList /> : null}
         </Animated.View>
       </Center>
-      <View style={styles.btnForm}>
-        <Flex direction="column" alignItems="center">
+      <View style={styles.swipeBtn}>
+        <Flex w="100%" direction="column" alignItems="center">
           {todoStore.todoList.length > 0 && (
             <Button
               style={styles.buttonAddTodo}
@@ -76,27 +81,29 @@ const HomePage: React.FC<{}> = () => {
               {isAddTodo ? 'todo list' : 'add todo'}
             </Button>
           )}
-          <Text style={(styles.text, styles.textFilters)}>Filters</Text>
-          <Flex w="92.5%" direction="row" justifyContent="space-between">
-            <Button
-              style={styles.button}
-              onPress={() => {
-                console.log('by date');
-              }}
-            >
-              by date
-            </Button>
-            <Button
-              style={styles.button}
-              onPress={() => {
-                console.log('show all');
-              }}
-            >
-              show all
-            </Button>
-          </Flex>
         </Flex>
       </View>
+      <Flex alignItems="center" direction="column" w="100%" style={styles.btnForm}>
+        <Text style={(styles.text, styles.textFilters)}>Filters</Text>
+        <Flex direction="row" justifyContent="space-between" w="91%">
+          <Button
+            style={styles.button}
+            onPress={() => {
+              console.log('by date');
+            }}
+          >
+            by date
+          </Button>
+          <Button
+            style={styles.button}
+            onPress={() => {
+              console.log('show all');
+            }}
+          >
+            show all
+          </Button>
+        </Flex>
+      </Flex>
     </View>
   );
 };
@@ -108,16 +115,21 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   button: { width: 140, marginBottom: 20 },
-  buttonAddTodo: { width: 345, marginTop: 20, marginBottom: 5 },
+  buttonAddTodo: { width: 320, marginTop: 20, marginBottom: 5 },
   text: { marginBottom: 20, fontSize: 20 },
   textFilters: {
     fontSize: 20,
-    marginBottom: 5,
+    marginVertical: 5,
+  },
+  swipeBtn: {
+    position: 'absolute',
+    top: 540,
+    left: 35,
   },
   btnForm: {
     position: 'absolute',
-    top: 530,
-    left: 10,
+    top: 600,
+    left: 20,
   },
   addForm: {
     position: 'absolute',

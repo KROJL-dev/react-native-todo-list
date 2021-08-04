@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Text, View, StyleSheet, Animated } from 'react-native';
-import { Image, Center, Button, Flex } from 'native-base';
+import { Text, View, StyleSheet, Animated, ScrollView } from 'react-native';
+import { Image, Center, Button, Heading, Flex } from 'native-base';
 
 import { ITodo } from '../../models/todo';
 
@@ -39,13 +39,9 @@ const TodoCard: React.FC<IProps> = ({ todo }) => {
           break;
       }
     }
-  }, [todo]);
-  const handleDeleteTodo = async () => {
-    toggleStartedAnimation(0, animationDelete);
-    await new Promise((r) => setTimeout(r, 300));
-    todoStore.deleteTodo(todo.id);
     
-  };
+  }, [todo]);
+   
   return (
     <Animated.View
       style={{
@@ -53,7 +49,14 @@ const TodoCard: React.FC<IProps> = ({ todo }) => {
       }}
     >
       <View style={styles.card}>
-        <Button style={styles.deleteIcon} onPress={handleDeleteTodo}>
+        <Button
+          style={styles.deleteIcon}
+          onPress={async () => {
+            toggleStartedAnimation(0, animationDelete);
+            await new Promise((r) => setTimeout(r, 300));
+            todoStore.deleteTodo(todo.id);
+          }}
+        >
           <Image source={{ uri: CLOSEICON }} alt="x" style={styles.icon} />
         </Button>
         <Center>
@@ -66,7 +69,12 @@ const TodoCard: React.FC<IProps> = ({ todo }) => {
               size={'xl'}
             />
           )}
-          <Text style={styles.icon}>{todo.title}</Text>
+          <Flex direction="column">
+            <Heading style={styles.title}>{todo.title}</Heading>
+            <Text style={styles.description}>{todo.description}</Text>
+            <Text>Created at: {todo.createdAt}</Text>
+            {todo.deadline?.length && <Text>Deadline: {todo.deadline}</Text>}
+          </Flex>
         </Center>
       </View>
     </Animated.View>
@@ -85,8 +93,18 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
   },
   icon: {
-    height: 30,
-    width: 30,
+    height: 20,
+    width: 20,
+  },
+  title: {
+    height: 50,
+    width: 130,
+    
+  },
+  description:{
+    fontSize:20,
+    maxHeight:190,
+    overflow:"scroll"
   },
   deleteIcon: {
     backgroundColor: 'transparent',

@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 
+import DatePicker from 'react-native-date-picker';
+
 import {
   Input,
   Select,
@@ -17,6 +19,8 @@ const AddTodoForm: React.FC<{}> = () => {
   const [category, setCategory] = useState<Categories>(Categories.home);
   const [title, setTitle] = useState<string>('');
   const [description, setDescription] = useState<string>('');
+  const [date, setDate] = useState(new Date());
+
   const { todoStore } = useStore();
 
   const handleSetCategories = (categoryString: string) => {
@@ -83,12 +87,18 @@ const AddTodoForm: React.FC<{}> = () => {
           <Select.Item label="Home" value="home" />
           <Select.Item label="Study" value="study" />
         </Select>
+        <DatePicker
+          date={date}
+          onDateChange={setDate}
+          style={{ borderRadius: 100 }}
+        />
         <Button
           onPress={() =>
             todoStore.addTodo({
               todoTitle: title,
               todoDescription: description,
               todoCategory: category,
+              todoDeadline:date
             })
           }
         >

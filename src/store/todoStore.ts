@@ -9,6 +9,7 @@ interface IAddTodo {
   todoTitle: string;
   todoDescription: string;
   todoCategory: Categories;
+  todoDeadline: Date
 }
 export class TodoStore {
   rootStore: RootStore;
@@ -20,24 +21,29 @@ export class TodoStore {
   }
 
   @action
-  addTodo = ({ todoTitle, todoDescription, todoCategory }: IAddTodo) => {
-   
+  addTodo = ({
+    todoTitle,
+    todoDescription,
+    todoCategory,
+    todoDeadline,
+  }: IAddTodo) => {
     this.todoList = [
       ...this.todoList,
       {
         title: todoTitle,
         description: todoDescription,
         category: Categories[todoCategory],
-        createdAt: dayjs(new Date()).format('DD/MM/YYYY'),
+        createdAt: dayjs(new Date()).format('DD/MM HH:mm:ss'),
         id: generateId(),
         isComplited: false,
+        deadline: dayjs(todoDeadline).format('DD/MM HH:mm:ss'),
       },
     ];
   };
 
   @action
   deleteTodo = (id: string) => {
-    console.log("todoDelete")
+    console.log('todoDelete');
     this.todoList = this.todoList.filter((todo) => todo.id !== id);
   };
 }
