@@ -1,11 +1,13 @@
 export interface ITodo {
   title: string;
   description: string;
-  isComplited: string;
-  category: Categories;
+  isComplited: boolean;
+  category: string;
   id:string
+  createdAt:string
+  deadline?:string
 }
 
-enum Categories {
-    "home", "work"
+export enum Categories {
+    "home", "work", "study"
 }

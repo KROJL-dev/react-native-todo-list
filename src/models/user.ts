@@ -1,6 +1,7 @@
 export interface IUser {
   firstName: string;
   lastName: string;
-  gender?: string
-  year?:number
+
+  gender?: string;
+  year?: number;
 }

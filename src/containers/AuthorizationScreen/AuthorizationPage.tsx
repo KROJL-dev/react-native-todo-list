@@ -6,15 +6,12 @@ import { observer } from 'mobx-react';
 
 import {
   Center,
-  Input,
   Button,
   Spinner,
   HStack,
   Heading,
   Alert,
-  Stack,
   View,
-  Text,
 } from 'native-base';
 
 import todoLogo from '../../assets/img/task-logo.png';
@@ -29,31 +26,34 @@ const LoginPage: React.FC<{}> = () => {
   const swipeAnimationRegistration = useRef(new Animated.Value(-300)).current;
   const swipeAnimationLoading = useRef(new Animated.Value(500)).current;
   const swipeAnimationError = useRef(new Animated.Value(700)).current;
+
   const { userStore } = useStore();
 
   const [loading, setIsLoading] = useState<boolean>(false);
   const [isRegistration, setIsRegistration] = useState<boolean>(false);
 
   useEffect(() => {
+     
     if (isRegistration) {
-      toggleStartedAnimation(300, swipeAnimationLogin);
+      console.log('useee Registration if', isRegistration);
+      toggleStartedAnimation(350, swipeAnimationLogin);
       toggleStartedAnimation(0, swipeAnimationRegistration);
     } else {
+      console.log('useee Registration else', isRegistration);
       toggleStartedAnimation(0, swipeAnimationLogin);
       toggleStartedAnimation(-300, swipeAnimationRegistration);
     }
   }, [isRegistration]);
 
   useEffect(() => {
-    
     if (loading) {
+      
       toggleStartedAnimation(350, swipeAnimationLogin, 200);
       toggleStartedAnimation(500, swipeAnimationLoading, 200);
       toggleStartedAnimation(-300, swipeAnimationRegistration);
     } else {
       toggleStartedAnimation(0, swipeAnimationLogin);
       toggleStartedAnimation(700, swipeAnimationLoading);
-      
     }
   }, [loading]);
 
@@ -113,12 +113,15 @@ const LoginPage: React.FC<{}> = () => {
             transform: [{ translateX: swipeAnimationLogin }],
             position: 'absolute',
             top: 0,
+            width: 250,
           }}
         >
-          <Login handleLoading={setIsLoading} />
-          <Button onPress={() => setIsRegistration(!isRegistration)} mt={4}>
-            reg
-          </Button>
+          <Login
+            handleLoading={setIsLoading}
+            handleIsRegistration={() => {
+              setIsRegistration(!isRegistration);
+            }}
+          />
         </Animated.View>
         {/* LOGIN SECTION */}
       </Center>
@@ -130,11 +133,11 @@ const LoginPage: React.FC<{}> = () => {
           left: 50,
         }}
       >
-        <View style={{ position: 'absolute', top: 0 }}>
+        <View style={{ position: 'absolute', top: 0 , left:40}}>
           <Alert w="100%">
             <Alert.Icon />
-            <Alert.Title>Wrong credential</Alert.Title>
-            <Alert.Description>Please, try again</Alert.Description>
+            <Alert.Title>EROR</Alert.Title>
+            <Alert.Description>{userStore.errorMessage}</Alert.Description>
           </Alert>
         </View>
       </Animated.View>
@@ -142,10 +145,3 @@ const LoginPage: React.FC<{}> = () => {
   );
 };
 export default observer(LoginPage);
-
-const styles = StyleSheet.create({
-  warningMessage: {
-    position: 'absolute',
-    top: '50',
-  },
-});

@@ -12,8 +12,9 @@ import { IUser } from '../../models/user';
 
 interface IProps {
   handleLoading: Function;
+  handleIsRegistration: Function;
 }
-const Login: React.FC<IProps> = ({ handleLoading }) => {
+const Login: React.FC<IProps> = ({ handleLoading, handleIsRegistration }) => {
   const {
     handleSubmit,
     control,
@@ -24,7 +25,7 @@ const Login: React.FC<IProps> = ({ handleLoading }) => {
 
   const onSubmit = (data: IUser) => {
     handleLoading(true);
-     
+
     setTimeout(
       () =>
         userStore.login(data.firstName, data.lastName).then(() => {
@@ -74,7 +75,10 @@ const Login: React.FC<IProps> = ({ handleLoading }) => {
           defaultValue=""
         />
         {errors.lastName && <Text>This is required.</Text>}
-        <Button onPress={handleSubmit(onSubmit)} >Submit</Button>
+        <Button onPress={handleSubmit(onSubmit)}>Submit</Button>
+        <Button onPress={() => handleIsRegistration()}>
+          Registration
+        </Button>
       </Stack>
     </Center>
   );

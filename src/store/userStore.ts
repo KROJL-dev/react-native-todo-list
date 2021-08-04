@@ -5,48 +5,79 @@ import { IUser } from '../models/user';
 
 import _ from 'lodash';
 
+import AsyncStorage from '@react-native-community/async-storage';
+
 export class UserStore {
   rootStore: RootStore;
 
-  @observable users: IUser[] = [{ firstName: 'den', lastName: 'kek' }];
+  @observable users: IUser[] = [];
   @observable isUser?: boolean;
-  @observable isCanGoHomePage: boolean = false
+  @observable isCanGoHomePage: boolean = false;
+  @observable errorMessage: string = '';
+  @observable currentUser?: IUser;
   constructor(rootStore: RootStore) {
     this.rootStore = rootStore;
     makeAutoObservable(this);
   }
 
+  @action
   login = async (firstName: string, lastName: string) => {
+    console.log("login")
     if (this.checkUser(firstName, lastName)) {
-      this.isUser = true
+      this.isUser = true;
       this.isCanGoHomePage = true;
-    }
-    else{
-      this.isUser = false
-      setTimeout(()=>{this.isUser = undefined}, 4000)
+      AsyncStorage.setItem('currentUser', JSON.stringify(this.currentUser));
+    } else {
+      this.errorMessage = 'wrong credetial';
+      this.isUser = false;
+      setTimeout(() => {
+        this.isUser = undefined;
+      }, 2500);
     }
   };
+
   @action
-  registration = async(firstName: string, lastName: string) => {
-    this.users = [...this.users, { firstName, lastName }];
-    this.isCanGoHomePage = true
+  checkAfterReload = async() => {
+    const dataFromStorage = await AsyncStorage.getItem('users');
+    if(dataFromStorage!==null){
+      this.users = JSON.parse(dataFromStorage) as unknown as IUser[];
+    }
+    
+  };
+  @action
+  registration = async (firstName: string, lastName: string) => {
+    if (!this.checkUser(firstName, lastName)) {
+      this.users = [...this.users, { firstName, lastName }];
+      AsyncStorage.setItem('users', JSON.stringify(this.users));
+      this.isUser = true; // for throw error ()
+      this.isCanGoHomePage = true;
+      return true;
+    } else {
+      this.isUser = false;
+      this.errorMessage = 'user allready exist';
+      setTimeout(() => {
+        this.isUser = undefined;
+      }, 2500);
+      return false;
+    }
   };
 
   @action
   checkUser = (firstName: string, lastName: string) => {
     let newUsers = _.cloneDeep(this.users);
-    let loginSucces = false;
+    let isUserExist = false;
+    console.log(firstName,lastName);
+     console.log(newUsers, 'this.users');
     newUsers.map((user) => {
       if (
-        user.firstName === firstName.toLocaleLowerCase() &&
-        user.lastName === lastName.toLocaleLowerCase()
+        user.firstName.toLocaleLowerCase() === firstName.toLocaleLowerCase() &&
+        user.lastName.toLocaleLowerCase() === lastName.toLocaleLowerCase()
       ) {
-        loginSucces = true;
+        isUserExist = true;
+        this.currentUser = user;
         return;
-        console.log('return ');
       }
-      console.log(user, 'user');
     });
-    return loginSucces;
+    return isUserExist;
   };
 }

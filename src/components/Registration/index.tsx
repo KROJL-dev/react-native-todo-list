@@ -10,7 +10,6 @@ interface IProps {
 }
 
 const Registration: React.FC<IProps> = ({ handleLoading }) => {
-
   const { userStore } = useStore();
 
   const {
@@ -20,16 +19,20 @@ const Registration: React.FC<IProps> = ({ handleLoading }) => {
   } = useForm();
 
   const handleSubmitRegistration = (data: IUser) => {
-       
-      handleLoading(true);
+    handleLoading(true);
 
-      setTimeout(
-        () =>
-          userStore.registration(data.firstName, data.lastName).then(() => {
+    setTimeout(
+      () =>
+        userStore
+          .registration(
+            data.firstName.toLocaleLowerCase(),
+            data.lastName.toLocaleLowerCase()
+          )
+          .then(() => {
             handleLoading(false);
           }),
-        1000
-      );
+      1000
+    );
   };
   return (
     <Center w="100%" px={8}>
