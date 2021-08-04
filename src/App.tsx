@@ -25,17 +25,6 @@ const App: React.FC<{}> = () => {
 
   const { userStore } = useStore();
 
-   useEffect(() => {
-     (async () => {
-       userStore.checkAfterReload();
-       let currentUser = await AsyncStorage.getItem('currentUser');
-       if (currentUser !== null) {
-         let newCurrentUser = JSON.parse(currentUser) as unknown as IUser;
-
-         userStore.login(newCurrentUser.firstName, newCurrentUser.lastName);
-       }
-     })();
-   }, []);
   return (
     <NavigationContainer>
       <NativeBaseProvider>
