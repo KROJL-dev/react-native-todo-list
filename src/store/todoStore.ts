@@ -1,39 +1,60 @@
-import { action, makeAutoObservable, observable } from 'mobx';
-import { ITodo, Categories } from '../models/todo';
-import { RootStore } from './store';
-
 import AsyncStorage from '@react-native-community/async-storage';
 
-import generateId from '../utils/generateId'
+import { action, makeAutoObservable, observable } from 'mobx';
+
 import dayjs from 'dayjs';
+
+import { ITodo, Categories } from '../models/todo';
+
+import { RootStore } from './store';
+
+import generateId from '../utils/generateId';
 
 interface IAddTodo {
   todoTitle: string;
   todoDescription: string;
   todoCategory: Categories;
-  todoDeadline: Date
+  todoDeadline: Date;
 }
+
 export class TodoStore {
   rootStore: RootStore;
 
   @observable todoList: ITodo[] = [];
+  @observable complitedTodoList: ITodo[] = [];
+
   constructor(rootStore: RootStore) {
     this.rootStore = rootStore;
-
-    (async () => {
-      
-      let todoList = await AsyncStorage.getItem('todoList');
-      if (todoList !== null) {
-        let newTodoList = JSON.parse(todoList) as unknown as ITodo[];
-        this.todoList = newTodoList
-      }
-    })();
-
     makeAutoObservable(this);
   }
 
   @action
-  addTodo = async({
+  checkTodoAfterReload = async (userId: string) => {
+    let todoList = await AsyncStorage.getItem(`${userId} todoList`);
+    if (todoList !== null) {
+      let newTodoList = JSON.parse(todoList) as unknown as ITodo[];
+      this.todoList = newTodoList;
+    }
+  };
+
+  @action
+  addToComplitedTodo = (todoId: string):boolean => {
+    let todoForAdd = this.todoList.map((todo) => {
+      if (todoId === todo.id) {
+        return todo;
+      }
+    });
+    if (todoForAdd[0]!==undefined){
+      this.complitedTodoList = [...this.complitedTodoList, todoForAdd[0]];
+      return true
+    }
+    else{
+      return false
+    }
+  };
+
+  @action
+  addTodo = async ({
     todoTitle,
     todoDescription,
     todoCategory,
@@ -51,12 +72,15 @@ export class TodoStore {
         deadline: dayjs(todoDeadline).format('DD/MM HH:mm:ss'),
       },
     ];
-    await AsyncStorage.setItem('todoList', JSON.stringify(this.todoList));
+
+    await AsyncStorage.setItem(
+      `${this.rootStore.userStore.currentUser?.userId} todoList`,
+      JSON.stringify(this.todoList)
+    );
   };
 
   @action
   deleteTodo = (id: string) => {
-    console.log('todoDelete');
     this.todoList = this.todoList.filter((todo) => todo.id !== id);
   };
 }

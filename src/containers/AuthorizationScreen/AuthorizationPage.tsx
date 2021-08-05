@@ -1,27 +1,30 @@
 import React, { useState, useEffect, useRef } from 'react';
 
-import { Image, StyleSheet, Animated } from 'react-native';
+import { Image, Animated } from 'react-native';
 
 import { observer } from 'mobx-react';
 
 import {
   Center,
-  Button,
   Spinner,
   HStack,
   Heading,
   Alert,
   View,
 } from 'native-base';
+ 
+import { toggleStartedAnimation } from '../../utils/toggleStartedAnimation';
 
 import todoLogo from '../../assets/img/task-logo.png';
 
 import { useStore } from '../../store/store';
 
 import Login from '../../components/Login';
+
 import Registration from '../../components/Registration';
 
 const LoginPage: React.FC<{}> = () => {
+
   const swipeAnimationLogin = useRef(new Animated.Value(0)).current;
   const swipeAnimationRegistration = useRef(new Animated.Value(-300)).current;
   const swipeAnimationLoading = useRef(new Animated.Value(500)).current;
@@ -33,13 +36,10 @@ const LoginPage: React.FC<{}> = () => {
   const [isRegistration, setIsRegistration] = useState<boolean>(false);
 
   useEffect(() => {
-     
     if (isRegistration) {
-      console.log('useee Registration if', isRegistration);
       toggleStartedAnimation(350, swipeAnimationLogin);
       toggleStartedAnimation(0, swipeAnimationRegistration);
     } else {
-      console.log('useee Registration else', isRegistration);
       toggleStartedAnimation(0, swipeAnimationLogin);
       toggleStartedAnimation(-300, swipeAnimationRegistration);
     }
@@ -47,7 +47,6 @@ const LoginPage: React.FC<{}> = () => {
 
   useEffect(() => {
     if (loading) {
-      
       toggleStartedAnimation(350, swipeAnimationLogin, 200);
       toggleStartedAnimation(500, swipeAnimationLoading, 200);
       toggleStartedAnimation(-300, swipeAnimationRegistration);
@@ -64,19 +63,6 @@ const LoginPage: React.FC<{}> = () => {
       toggleStartedAnimation(700, swipeAnimationError);
     }
   }, [userStore.isUser]);
-
-  const toggleStartedAnimation = (
-    value: number,
-    ref: Animated.Value,
-    duration: number = 400
-  ) => {
-    Animated.timing(ref, {
-      toValue: value,
-      duration: duration,
-      easing: (v) => v,
-      useNativeDriver: true,
-    }).start();
-  };
 
   return (
     <Center>
@@ -133,7 +119,7 @@ const LoginPage: React.FC<{}> = () => {
           left: 50,
         }}
       >
-        <View style={{ position: 'absolute', top: 0 , left:40}}>
+        <View style={{ position: 'absolute', top: 0, left: 40 }}>
           <Alert w="100%">
             <Alert.Icon />
             <Alert.Title>EROR</Alert.Title>

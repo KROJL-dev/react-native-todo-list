@@ -1,11 +1,14 @@
+import AsyncStorage from '@react-native-community/async-storage';
+
 import { makeAutoObservable, action, observable } from 'mobx';
+
+import _ from 'lodash';
+
 import { RootStore } from './store';
 
 import { IUser } from '../models/user';
 
-import _ from 'lodash';
-
-import AsyncStorage from '@react-native-community/async-storage';
+import generateId from '../utils/generateId';
 
 export class UserStore {
   rootStore: RootStore;
@@ -15,31 +18,44 @@ export class UserStore {
   @observable isCanGoHomePage: boolean = false;
   @observable errorMessage: string = '';
   @observable currentUser?: IUser;
+
   constructor(rootStore: RootStore) {
     this.rootStore = rootStore;
     (async () => {
       await this.checkAfterReload();
       let currentUser = await AsyncStorage.getItem('currentUser');
       if (currentUser !== null) {
-         let newCurrentUser = JSON.parse(currentUser) as unknown as IUser;
+        let newCurrentUser = JSON.parse(currentUser) as unknown as IUser;
 
-         await this.login(newCurrentUser.firstName, newCurrentUser.lastName);
+        await this.login(newCurrentUser.firstName, newCurrentUser.lastName);
       }
     })();
-     
+
     makeAutoObservable(this);
   }
 
   @action
+  logout = async () => {
+    if (this.currentUser !== undefined) {
+      this.isUser = undefined;
+      this.rootStore.todoStore.todoList = [];
+      this.isCanGoHomePage = false;
+
+      AsyncStorage.removeItem('currentUser');
+    }
+  };
+
+  @action
   login = async (firstName: string, lastName: string) => {
-    console.log('login');
-    if (this.checkUser(firstName, lastName)) {
-      this.isUser = true;
+    this.isUser = this.checkUser(firstName, lastName);
+    if (this.isUser) {
       this.isCanGoHomePage = true;
+
+      AsyncStorage.removeItem('currentUser');
       AsyncStorage.setItem('currentUser', JSON.stringify(this.currentUser));
     } else {
       this.errorMessage = 'wrong credetial';
-      this.isUser = false;
+
       setTimeout(() => {
         this.isUser = undefined;
       }, 2500);
@@ -56,17 +72,24 @@ export class UserStore {
   @action
   registration = async (firstName: string, lastName: string) => {
     if (!this.checkUser(firstName, lastName)) {
-      this.users = [...this.users, { firstName, lastName }];
-      AsyncStorage.setItem('users', JSON.stringify(this.users));
-      this.isUser = true; // for throw error ()
+      this.currentUser = { firstName, lastName, userId: generateId() };
+      this.users = [...this.users, this.currentUser];
+      this.isUser = true;
       this.isCanGoHomePage = true;
+
+      AsyncStorage.removeItem('currentUser');
+      AsyncStorage.setItem('currentUser', JSON.stringify(this.currentUser));
+      AsyncStorage.setItem('users', JSON.stringify(this.users));
+
       return true;
     } else {
       this.isUser = false;
       this.errorMessage = 'user allready exist';
+
       setTimeout(() => {
         this.isUser = undefined;
       }, 2500);
+
       return false;
     }
   };
@@ -75,8 +98,7 @@ export class UserStore {
   checkUser = (firstName: string, lastName: string) => {
     let newUsers = _.cloneDeep(this.users);
     let isUserExist = false;
-    console.log(firstName, lastName);
-    console.log(newUsers, 'this.users');
+
     newUsers.map((user) => {
       if (
         user.firstName.toLocaleLowerCase() === firstName.toLocaleLowerCase() &&
@@ -84,9 +106,11 @@ export class UserStore {
       ) {
         isUserExist = true;
         this.currentUser = user;
+
         return;
       }
     });
+
     return isUserExist;
   };
 }

@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { StyleSheet, Text, Animated } from 'react-native';
 
-import { toggleStartedAnimation } from '../../utils/toggleStartedAnimation';
+import { StyleSheet, Text, Animated } from 'react-native';
 
 import { Button, Heading, View, Center, Flex } from 'native-base';
 
 import { observer } from 'mobx-react';
 
 import { useStore } from '../../store/store';
+
+import { toggleStartedAnimation } from '../../utils/toggleStartedAnimation';
 
 import TodoList from '../../components/TodoList/index';
 import AddTodoForm from '../../components/AddTodoForm/index';

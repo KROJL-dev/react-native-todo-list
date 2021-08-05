@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
+
+import { StyleSheet, Animated } from 'react-native';
 
 import DatePicker from 'react-native-date-picker';
 
@@ -10,19 +12,26 @@ import {
   Stack,
   Button,
   Text,
+  Alert,
+  Center,
 } from 'native-base';
+
+import { toggleStartedAnimation } from '../../utils/toggleStartedAnimation';
 
 import { Categories } from '../../models/todo';
 
 import { useStore } from '../../store/store';
-import { StyleSheet } from 'react-native';
 
 const AddTodoForm: React.FC<{}> = () => {
+  const swipeAnimationError = useRef(new Animated.Value(700)).current;
+  const swipeAnimationSubmitBtn = useRef(new Animated.Value(0)).current;
+
   const [category, setCategory] = useState<Categories>(Categories.home);
   const [title, setTitle] = useState<string>('');
   const [description, setDescription] = useState<string>('');
   const [date, setDate] = useState(new Date());
 
+  const [errorMessage, setErrorMessage] = useState<string>();
   const { todoStore } = useStore();
 
   const handleSetCategories = (categoryString: string) => {
@@ -38,6 +47,58 @@ const AddTodoForm: React.FC<{}> = () => {
         break;
     }
   };
+
+  const handleError = (): boolean => {
+    let isError = false;
+    let errorMsg = '';
+
+    if (title.length === 0) {
+      errorMsg = 'Min length for title: 2';
+      isError = true;
+    }
+
+    if (description.split(' ').length < 2) {
+      isError = true;
+      if (errorMsg.length) {
+        errorMsg = errorMsg + '.' + 'Min word count for description: 2';
+      }
+      else{
+         errorMsg = 'Min word count for description: 2';
+      }
+    }
+    if (description.length > 80) {
+      isError = true;
+      if (errorMsg.length) {
+        errorMsg = errorMsg + '.' + 'To long description';
+      }
+      else{
+        errorMsg = 'To long description';
+      }
+       
+    }
+    setErrorMessage(errorMsg)
+    return isError;
+  };
+
+  const handleAddTodo = () => {
+    if (!handleError()) {
+      todoStore.addTodo({
+        todoTitle: title,
+        todoDescription: description,
+        todoCategory: category,
+        todoDeadline: date,
+      });
+    } else {
+      toggleStartedAnimation(400, swipeAnimationError);
+      toggleStartedAnimation(700, swipeAnimationSubmitBtn);
+      setTimeout(() => {
+        setErrorMessage('');
+        toggleStartedAnimation(0, swipeAnimationSubmitBtn);
+        toggleStartedAnimation(700, swipeAnimationError);
+      }, 2500);
+    }
+  };
+
   return (
     <Container w="100%">
       <Stack space={4} w="100%">
@@ -95,19 +156,35 @@ const AddTodoForm: React.FC<{}> = () => {
           onDateChange={setDate}
           style={{ borderRadius: 100 }}
         />
-        <Button
-          onPress={() =>
-            todoStore.addTodo({
-              todoTitle: title,
-              todoDescription: description,
-              todoCategory: category,
-              todoDeadline: date,
-            })
-          }
+        <Animated.View
+          style={{
+            transform: [{ translateY: swipeAnimationSubmitBtn }],
+          }}
         >
-          Submit
-        </Button>
+          <Button onPress={handleAddTodo}>Submit</Button>
+        </Animated.View>
       </Stack>
+      <Animated.View
+        style={{
+          transform: [{ translateY: swipeAnimationError }],
+          position: 'absolute',
+          top: 25,
+        }}
+      >
+        <Center>
+          <Alert >
+            <Alert.Icon />
+            <Alert.Title>EROR</Alert.Title>
+            <Alert.Description>
+              <Stack>
+                {errorMessage?.split('.').map((error, i) => (
+                  <Text key={i}>{error}</Text>
+                ))}
+              </Stack>
+            </Alert.Description>
+          </Alert>
+        </Center>
+      </Animated.View>
     </Container>
   );
 };
@@ -116,6 +193,6 @@ export default AddTodoForm;
 const styles = StyleSheet.create({
   deadlineDescr: {
     position: 'absolute',
-    top:205
+    top: 205,
   },
 });

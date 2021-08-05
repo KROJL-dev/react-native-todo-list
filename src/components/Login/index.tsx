@@ -14,6 +14,7 @@ interface IProps {
   handleLoading: Function;
   handleIsRegistration: Function;
 }
+
 const Login: React.FC<IProps> = ({ handleLoading, handleIsRegistration }) => {
   const {
     handleSubmit,

@@ -1,16 +1,20 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Text, View, StyleSheet, Animated, ScrollView } from 'react-native';
-import { Image, Center, Button, Heading, Flex } from 'native-base';
+import { Text, StyleSheet, Animated, TouchableOpacity } from 'react-native';
+import { Image, Center, Button, Flex, View } from 'native-base';
 
 import { ITodo } from '../../models/todo';
 
 import { useStore } from '../../store/store';
 
 import { toggleStartedAnimation } from '../../utils/toggleStartedAnimation';
+import { position } from 'styled-system';
 
 const WORKICON = 'https://image.flaticon.com/icons/png/512/3281/3281289.png';
 const HOMEICON = 'https://image.flaticon.com/icons/png/512/619/619032.png';
 const STUDYICON = 'https://image.flaticon.com/icons/png/512/2232/2232688.png';
+
+const COMPLITEDICON =
+  'https://image.flaticon.com/icons/png/512/4558/4558892.png';
 
 const CLOSEICON = 'https://image.flaticon.com/icons/png/512/1828/1828778.png';
 
@@ -20,11 +24,13 @@ interface IProps {
 
 const TodoCard: React.FC<IProps> = ({ todo }) => {
   const [currentURLImage, setCurrentURLImage] = useState('');
-
+  const [isComplitedScene, setIsComplitedScene] = useState<boolean>(false);
+  const [isComplitedSceneRender, setIsComplitedSceneRender] =
+    useState<boolean>(false);
   const { todoStore } = useStore();
 
   const animationDelete = useRef(new Animated.Value(1)).current;
-
+  const animationCompliteBackground = useRef(new Animated.Value(0)).current;
   useEffect(() => {
     if (todo.category !== undefined) {
       switch (todo.category) {
@@ -39,16 +45,49 @@ const TodoCard: React.FC<IProps> = ({ todo }) => {
           break;
       }
     }
-    
   }, [todo]);
-   
+
+  useEffect(() => {
+    (async () => {
+      if (isComplitedScene) {
+       
+        const animationInterval = setInterval(async () => {
+          toggleStartedAnimation(1, animationCompliteBackground);
+          await new Promise((r) => setTimeout(r, 400));
+          toggleStartedAnimation(0, animationCompliteBackground);
+        }, 800);
+        setTimeout(()=>{
+          clearInterval(animationInterval);
+          setIsComplitedScene(false)
+        },4150);
+      }
+    })();
+
+  }, [isComplitedScene]);
+ 
   return (
     <Animated.View
       style={{
         transform: [{ scale: animationDelete }],
       }}
     >
-      <View style={styles.card}>
+      <TouchableOpacity
+        style={styles.card}
+        onPress={() => {
+          setIsComplitedScene(true);
+        }}
+      >
+        {isComplitedScene && (
+          <Animated.View
+            style={{
+              ...styles.complitedScene,
+              opacity: animationCompliteBackground,
+            }}
+            pointerEvents="none"
+          >
+            <Image source={{ uri: COMPLITEDICON }} alt="KRASAVA" />
+          </Animated.View>
+        )}
         <Button
           style={styles.deleteIcon}
           onPress={async () => {
@@ -69,14 +108,24 @@ const TodoCard: React.FC<IProps> = ({ todo }) => {
               size={'xl'}
             />
           )}
-          <Flex direction="column">
-            <Heading style={styles.title}>{todo.title}</Heading>
+          <Flex direction="column" alignItems="center">
+            <Text style={styles.title}>{todo.title}</Text>
+
             <Text style={styles.description}>{todo.description}</Text>
-            <Text>Created at: {todo.createdAt}</Text>
-            {todo.deadline?.length && <Text>Deadline: {todo.deadline}</Text>}
+
+            <Text style={styles.createdAt}>
+              Created at:{' '}
+              <Text style={styles.createdAtSpan}>{todo.createdAt}</Text>
+            </Text>
+            {todo.deadline?.length && (
+              <Text style={styles.deadline}>
+                Deadline:{' '}
+                <Text style={styles.deadlineSpan}>{todo.deadline}</Text>
+              </Text>
+            )}
           </Flex>
         </Center>
-      </View>
+      </TouchableOpacity>
     </Animated.View>
   );
 };
@@ -97,14 +146,18 @@ const styles = StyleSheet.create({
     width: 20,
   },
   title: {
-    height: 50,
-    width: 130,
-    
+    textAlign: 'center',
+    maxHeight: 250,
+    maxWidth: 130,
+    fontSize: 30,
+    fontWeight: '800',
+    color: '#3271a8',
   },
-  description:{
-    fontSize:20,
-    maxHeight:190,
-    overflow:"scroll"
+
+  description: {
+    textAlign: 'center',
+    fontSize: 24,
+    maxHeight: 145,
   },
   deleteIcon: {
     backgroundColor: 'transparent',
@@ -112,6 +165,26 @@ const styles = StyleSheet.create({
     height: 64,
     position: 'absolute',
 
-    zIndex: 111,
+    zIndex: 11112222222222222222222222222222222222222222222,
+  },
+  createdAt: {
+    fontSize: 16,
+  },
+  deadline: {
+    fontSize: 16,
+  },
+  createdAtSpan: {
+    color: '#2acf15',
+  },
+  deadlineSpan: {
+    color: '#de1212',
+  },
+  complitedScene: {
+    backgroundColor: 'rgba(88,157,59,0.3)',
+    zIndex: 10000002222,
+    position: 'absolute',
+    width: 250,
+    height: 420,
+    borderRadius: 12,
   },
 });

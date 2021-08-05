@@ -1,10 +1,12 @@
-import React, { Component } from 'react';
+import React from 'react';
 
-import { Center, Input, Button, Stack, Text, View } from 'native-base';
+import { Center, Input, Button, Stack, Text } from 'native-base';
+
 import { useForm, Controller } from 'react-hook-form';
 
 import { useStore } from '../../store/store';
 import { IUser } from '../../models/user';
+
 interface IProps {
   handleLoading: Function;
 }
