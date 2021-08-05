@@ -12,12 +12,15 @@ import { toggleStartedAnimation } from '../../utils/toggleStartedAnimation';
 
 import TodoList from '../../components/TodoList/index';
 import AddTodoForm from '../../components/AddTodoForm/index';
+import { ITodo } from '../../models/todo';
 
 const HomePage: React.FC<{}> = () => {
   const swiperAnimationTodoList = useRef(new Animated.Value(0)).current;
   const swiperAnimationAddForm = useRef(new Animated.Value(400)).current;
 
   const [isAddTodo, setIsAddTodo] = useState<boolean>(false);
+  const [isShowAll, setIsShowALl] = useState<boolean>(false);
+  const [currentTodosList, setCurrentTodoList] = useState<ITodo[]>([])
 
   const { userStore, todoStore } = useStore();
 
@@ -34,9 +37,20 @@ const HomePage: React.FC<{}> = () => {
   useEffect(() => {
     if (todoStore.todoList.length === 0) {
       setIsAddTodo(true);
+    }else{
+      setCurrentTodoList(todoStore.todoList);
+      setIsShowALl(false)
     }
-  }, [todoStore.todoList.length]);
+  }, [todoStore.todoList]);
 
+  useEffect(() => {
+    if(isShowAll){
+      setCurrentTodoList([...todoStore.complitedTodoList,...todoStore.todoList])
+    }
+    else{
+      setCurrentTodoList(todoStore.todoList);
+    }
+  }, [isShowAll]);
   return (
     <View style={styles.container} w="100%">
       <Heading>
@@ -48,7 +62,7 @@ const HomePage: React.FC<{}> = () => {
       {!isAddTodo && (
         <Text style={styles.text}>
           The nearest task{' '}
-          {todoStore.todoList.length > 0 && ':' + todoStore.todoList.length}
+          {currentTodosList.length > 0 && ':' + todoStore.todoList.length}
         </Text>
       )}
       <Center>
@@ -67,7 +81,9 @@ const HomePage: React.FC<{}> = () => {
             top: 0,
           }}
         >
-          {todoStore.todoList.length > 0 ? <TodoList /> : null}
+          {currentTodosList.length > 0 ? (
+            <TodoList todoList={currentTodosList} />
+          ) : null}
         </Animated.View>
       </Center>
       <View style={styles.swipeBtn}>
@@ -84,7 +100,12 @@ const HomePage: React.FC<{}> = () => {
           )}
         </Flex>
       </View>
-      <Flex alignItems="center" direction="column" w="100%" style={styles.btnForm}>
+      <Flex
+        alignItems="center"
+        direction="column"
+        w="100%"
+        style={styles.btnForm}
+      >
         <Text style={(styles.text, styles.textFilters)}>Filters</Text>
         <Flex direction="row" justifyContent="space-between" w="91%">
           <Button
@@ -98,10 +119,10 @@ const HomePage: React.FC<{}> = () => {
           <Button
             style={styles.button}
             onPress={() => {
-              console.log('show all');
+              setIsShowALl(!isShowAll);
             }}
           >
-            show all
+            {isShowAll ? 'show current' : 'show all'}
           </Button>
         </Flex>
       </Flex>

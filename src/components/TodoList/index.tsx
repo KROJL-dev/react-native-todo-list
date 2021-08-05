@@ -6,17 +6,18 @@ import Swiper from 'react-native-swiper';
 
 import { observer } from 'mobx-react';
 
-import { useStore } from '../../store/store';
+import { ITodo } from '../../models/todo';
 
 import TodoCard from '../TodoCard/index';
 
-const TodoList: React.FC<{}> = () => {
-  const { todoStore } = useStore();
-
+interface IProps {
+  todoList: ITodo[];
+}
+const TodoList: React.FC<IProps> = ({ todoList }) => {
   return (
     <View>
       <Swiper horizontal={true} loop={false}>
-        {todoStore.todoList.map((todo) => (
+        {todoList.map((todo) => (
           <Center key={todo.id}>
             <TodoCard todo={todo} />
           </Center>

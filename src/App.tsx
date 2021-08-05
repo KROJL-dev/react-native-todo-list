@@ -12,6 +12,7 @@ import AuthorizationPage from './containers/AuthorizationScreen/AuthorizationPag
 import HomePage from './containers/HomeScreen/Homepage';
 
 import { useStore } from './store/store';
+import AsyncStorage from '@react-native-community/async-storage';
 
 LogBox.ignoreLogs(['Warning: ...']);
 LogBox.ignoreAllLogs();
@@ -27,6 +28,7 @@ const App: React.FC<{}> = () => {
     }
   }, [userStore.currentUser?.userId]);
 
+  
   return (
     <NavigationContainer>
       <NativeBaseProvider>

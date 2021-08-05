@@ -47,7 +47,15 @@ export class UserStore {
 
   @action
   login = async (firstName: string, lastName: string) => {
+    if (firstName.length < 2 || lastName.length < 2) {
+      this.errorMessage = `${
+        firstName.length < 2 ? 'first name ' : 'last name'
+      } must have more than two letters`;
+      this.isCanGoHomePage = false;
+      return;
+    }
     this.isUser = this.checkUser(firstName, lastName);
+    
     if (this.isUser) {
       this.isCanGoHomePage = true;
 
@@ -71,7 +79,20 @@ export class UserStore {
   };
   @action
   registration = async (firstName: string, lastName: string) => {
+    if (firstName.length < 2 || lastName.length < 2) {
+
+      this.errorMessage = `${firstName.length < 2 ? 'first name ' : 'last name'} must have . more than two letters`;
+      this.isUser = false;
+      this.isCanGoHomePage = false;
+
+      setTimeout(() => {
+        this.isUser = undefined;
+      }, 2500);
+
+      return;
+    }
     if (!this.checkUser(firstName, lastName)) {
+      
       this.currentUser = { firstName, lastName, userId: generateId() };
       this.users = [...this.users, this.currentUser];
       this.isUser = true;
@@ -96,6 +117,8 @@ export class UserStore {
 
   @action
   checkUser = (firstName: string, lastName: string) => {
+     
+
     let newUsers = _.cloneDeep(this.users);
     let isUserExist = false;
 

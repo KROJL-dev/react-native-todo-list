@@ -7,7 +7,7 @@ import { ITodo } from '../../models/todo';
 import { useStore } from '../../store/store';
 
 import { toggleStartedAnimation } from '../../utils/toggleStartedAnimation';
-import { position } from 'styled-system';
+import { boxShadow, position } from 'styled-system';
 
 const WORKICON = 'https://image.flaticon.com/icons/png/512/3281/3281289.png';
 const HOMEICON = 'https://image.flaticon.com/icons/png/512/619/619032.png';
@@ -15,6 +15,8 @@ const STUDYICON = 'https://image.flaticon.com/icons/png/512/2232/2232688.png';
 
 const COMPLITEDICON =
   'https://image.flaticon.com/icons/png/512/4558/4558892.png';
+const COMPLITEDICONMINI =
+  'https://image.flaticon.com/icons/png/512/4857/4857721.png';
 
 const CLOSEICON = 'https://image.flaticon.com/icons/png/512/1828/1828778.png';
 
@@ -31,6 +33,8 @@ const TodoCard: React.FC<IProps> = ({ todo }) => {
 
   const animationDelete = useRef(new Animated.Value(1)).current;
   const animationCompliteBackground = useRef(new Animated.Value(0)).current;
+  const animationCompliteIcon = useRef(new Animated.Value(1)).current;
+  const animationCardWhenComplited = useRef(new Animated.Value(0)).current;
   useEffect(() => {
     if (todo.category !== undefined) {
       switch (todo.category) {
@@ -46,38 +50,58 @@ const TodoCard: React.FC<IProps> = ({ todo }) => {
       }
     }
   }, [todo]);
-
+  //aniation when user wanna complited woto
   useEffect(() => {
-    (async () => {
-      if (isComplitedScene) {
-       
-        const animationInterval = setInterval(async () => {
-          toggleStartedAnimation(1, animationCompliteBackground);
-          await new Promise((r) => setTimeout(r, 400));
-          toggleStartedAnimation(0, animationCompliteBackground);
-        }, 800);
-        setTimeout(()=>{
-          clearInterval(animationInterval);
-          setIsComplitedScene(false)
-        },4150);
-      }
-    })();
+    if(!todo.isComplited){
+      (async () => {
+        if (isComplitedScene) {
+          setIsComplitedSceneRender(true);
+          const animationInterval = setInterval(async () => {
+            toggleStartedAnimation(1, animationCompliteBackground);
+            toggleStartedAnimation(0.7, animationCompliteIcon);
+            await new Promise((r) => setTimeout(r, 400));
+            toggleStartedAnimation(0, animationCompliteBackground);
+            toggleStartedAnimation(1, animationCompliteIcon);
+          }, 800);
+          setTimeout(async () => {
+            clearInterval(animationInterval);
+            toggleStartedAnimation(0, animationCompliteIcon);
+            await new Promise((r) => setTimeout(r, 400));
+            setIsComplitedSceneRender(false);
+            setIsComplitedScene(false);
 
+            toggleStartedAnimation(-700, animationCardWhenComplited);
+            await new Promise((r) => setTimeout(r, 400));
+            todoStore.addToComplitedTodo(todo.id);
+          }, 3400);
+        }
+      })();
+    }
   }, [isComplitedScene]);
- 
+
   return (
     <Animated.View
       style={{
-        transform: [{ scale: animationDelete }],
+        transform: [
+          { scale: animationDelete },
+          { translateY: animationCardWhenComplited },
+        ],
       }}
     >
+      {todo.isComplited && (
+        <Image
+          source={{ uri: COMPLITEDICONMINI }}
+          alt="KRASAVA"
+          style={styles.complitedIconMini}
+        />
+      )}
       <TouchableOpacity
         style={styles.card}
         onPress={() => {
           setIsComplitedScene(true);
         }}
       >
-        {isComplitedScene && (
+        {isComplitedSceneRender && (
           <Animated.View
             style={{
               ...styles.complitedScene,
@@ -85,7 +109,12 @@ const TodoCard: React.FC<IProps> = ({ todo }) => {
             }}
             pointerEvents="none"
           >
-            <Image source={{ uri: COMPLITEDICON }} alt="KRASAVA" />
+            <Image
+              source={{ uri: COMPLITEDICON }}
+              alt="KRASAVA"
+              h="100%"
+              w="100%"
+            />
           </Animated.View>
         )}
         <Button
@@ -132,7 +161,16 @@ const TodoCard: React.FC<IProps> = ({ todo }) => {
 export default TodoCard;
 
 const styles = StyleSheet.create({
+  complitedIconMini: {
+    width: 50,
+    height: 50,
+    position: 'absolute',
+    top: 360,
+    right: -40,
+   
+  },
   card: {
+    overflow: 'visible',
     padding: 10,
     width: 250,
     height: 420,

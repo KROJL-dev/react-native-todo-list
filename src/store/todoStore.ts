@@ -38,19 +38,19 @@ export class TodoStore {
   };
 
   @action
-  addToComplitedTodo = (todoId: string):boolean => {
-    let todoForAdd = this.todoList.map((todo) => {
+  addToComplitedTodo = async (todoId: string) => {
+    this.todoList.map((todo) => {
       if (todoId === todo.id) {
-        return todo;
+        console.log('todoId', todoId, todo.id);
+        todo.isComplited = true;
+        this.complitedTodoList = [...this.complitedTodoList, todo];
       }
     });
-    if (todoForAdd[0]!==undefined){
-      this.complitedTodoList = [...this.complitedTodoList, todoForAdd[0]];
-      return true
-    }
-    else{
-      return false
-    }
+    this.deleteTodo(todoId);
+    await AsyncStorage.setItem(
+      `${this.rootStore.userStore.currentUser?.userId} todoList`,
+      JSON.stringify(this.todoList)
+    );
   };
 
   @action

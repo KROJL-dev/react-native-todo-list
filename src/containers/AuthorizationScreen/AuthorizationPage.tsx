@@ -11,6 +11,7 @@ import {
   Heading,
   Alert,
   View,
+  Text,
 } from 'native-base';
  
 import { toggleStartedAnimation } from '../../utils/toggleStartedAnimation';
@@ -123,7 +124,11 @@ const LoginPage: React.FC<{}> = () => {
           <Alert w="100%">
             <Alert.Icon />
             <Alert.Title>EROR</Alert.Title>
-            <Alert.Description>{userStore.errorMessage}</Alert.Description>
+            <Alert.Description>
+              {userStore.errorMessage.split('.').map((error, i) => (
+                <Text key={i}>{error}</Text>
+              ))}
+            </Alert.Description>
           </Alert>
         </View>
       </Animated.View>

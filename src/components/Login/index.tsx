@@ -76,7 +76,7 @@ const Login: React.FC<IProps> = ({ handleLoading, handleIsRegistration }) => {
           defaultValue=""
         />
         {errors.lastName && <Text>This is required.</Text>}
-        <Button onPress={handleSubmit(onSubmit)}>Submit</Button>
+        <Button onPress={handleSubmit(onSubmit)}>Login</Button>
         <Button onPress={() => handleIsRegistration()}>
           Registration
         </Button>
