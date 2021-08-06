@@ -14,6 +14,8 @@ import TodoList from '../../components/TodoList/index';
 import AddTodoForm from '../../components/AddTodoForm/index';
 import { ITodo } from '../../models/todo';
 
+ 
+
 const HomePage: React.FC<{}> = () => {
   const swiperAnimationTodoList = useRef(new Animated.Value(0)).current;
   const swiperAnimationAddForm = useRef(new Animated.Value(400)).current;
@@ -59,21 +61,31 @@ const HomePage: React.FC<{}> = () => {
         direction="column"
         style={styles.container}
         justifyContent="space-between"
-        
       >
-        <Heading>
-          Hello,{' '}
-          {userStore.currentUser?.firstName.charAt(0).toUpperCase() +
-            '' +
-            userStore.currentUser?.firstName.slice(1)}
-        </Heading>
-        {!isAddTodo && (
-          <Text style={styles.text}>
-            The nearest task{' '}
-            {currentTodosList.length > 0 && ':' + todoStore.todoList.length}
-          </Text>
-        )}
-        <Center w="100%">
+        <Flex direction="column">
+          <Heading>
+            Hello,{' '}
+            {userStore.currentUser?.firstName.charAt(0).toUpperCase() +
+              '' +
+              userStore.currentUser?.firstName.slice(1)}
+          </Heading>
+          {!isAddTodo && (
+            <Text style={styles.text}>
+              The nearest task{' '}
+              {currentTodosList.length > 0 && ':' + todoStore.todoList.length}
+            </Text>
+          )}
+        </Flex>
+        <Center
+          w="100%"
+          style={
+            isAddTodo
+              ? {}
+              : {
+                  height: Dimensions.get('window').height / 2,
+                }
+          }
+        >
           <Animated.View
             style={{
               transform: [{ translateX: swiperAnimationAddForm }],
@@ -95,7 +107,6 @@ const HomePage: React.FC<{}> = () => {
               transform: [{ translateX: swiperAnimationTodoList }],
               position: 'absolute',
               top: 0,
-              maxHeight: 400,
             }}
           >
             {currentTodosList.length > 0 && (
@@ -148,9 +159,9 @@ export default observer(HomePage);
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 20,
-    
+
     width: Dimensions.get('window').width,
-    height:Dimensions.get('window').height - 90
+    height: Dimensions.get('window').height - 90,
   },
   button: { width: 140 },
   buttonAddTodo: { width: 320, marginBottom: 5 },

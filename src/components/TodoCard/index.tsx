@@ -173,7 +173,7 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     position: 'absolute',
-    top: 360,
+    top: Dimensions.get('window').height / 2-50,
     right: -40,
   },
   card: {

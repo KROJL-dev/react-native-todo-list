@@ -1,10 +1,10 @@
 import React, { useState, useRef } from 'react';
 
-import { StyleSheet, Animated,Dimensions } from 'react-native';
+import { StyleSheet, Animated, Dimensions } from 'react-native';
 
 import DatePicker from 'react-native-date-picker';
 
-import dayjs from 'dayjs';
+import PushNotification from 'react-native-push-notification';
 
 import {
   Input,
@@ -28,14 +28,14 @@ import { useStore } from '../../store/store';
 const AddTodoForm: React.FC<{}> = () => {
   const swipeAnimationError = useRef(new Animated.Value(700)).current;
   const swipeAnimationSubmitBtn = useRef(new Animated.Value(0)).current;
-  const swipeAnimationDatePicker = useRef(new Animated.Value(0)).current
+  const swipeAnimationDatePicker = useRef(new Animated.Value(0)).current;
 
   const [category, setCategory] = useState<Categories>(Categories.home);
   const [title, setTitle] = useState<string>('');
   const [description, setDescription] = useState<string>('');
   const [date, setDate] = useState(new Date());
 
-  const [errorMessage, setErrorMessage] = useState<string>("");
+  const [errorMessage, setErrorMessage] = useState<string>('');
   const { todoStore } = useStore();
 
   const handleSetCategories = (categoryString: string) => {
@@ -60,7 +60,16 @@ const AddTodoForm: React.FC<{}> = () => {
       errorMsg = 'Min length for title: 2';
       isError = true;
     }
-
+    console.log('new Date() < date', new Date() > date);
+    if (new Date() > date) {
+      isError = true;
+      if (errorMsg.length) {
+        errorMsg =
+          errorMsg + '.' + 'deadline can not be before date of created todo';
+      } else {
+        errorMsg = 'deadline can not be before date of created todo';
+      }
+    }
     if (description.split(' ').length < 2) {
       isError = true;
       if (errorMsg.length) {
@@ -82,6 +91,19 @@ const AddTodoForm: React.FC<{}> = () => {
   };
 
   const handleAddTodo = () => {
+    PushNotification.localNotification({
+      autoCancel: true,
+      bigText:
+        'This is local notification demo in React Native app. Only shown, when expanded.',
+      subText: 'Local Notification Demo',
+      title: 'Local Notification Title',
+      message: 'Expand me to see more',
+      vibrate: true,
+      vibration: 300,
+      playSound: true,
+      soundName: 'default',
+      channelId: 'channel-id',
+    });
     if (!handleError()) {
       todoStore.addTodo({
         todoTitle: title,
@@ -96,16 +118,12 @@ const AddTodoForm: React.FC<{}> = () => {
         setErrorMessage('');
         toggleStartedAnimation(0, swipeAnimationSubmitBtn);
         toggleStartedAnimation(700, swipeAnimationError);
-
       }, 2500);
     }
   };
 
   return (
-    <Container
-      w={Dimensions.get('window').width}
-      
-    >
+    <Container w={Dimensions.get('window').width}>
       <Center w="100%">
         <Stack space={4} w="100%">
           <Input
@@ -178,18 +196,14 @@ const AddTodoForm: React.FC<{}> = () => {
               transform: [{ translateY: swipeAnimationSubmitBtn }],
             }}
           >
-            <Button
-              onPress={handleAddTodo}
-            >
-              Submit
-            </Button>
+            <Button onPress={handleAddTodo}>Submit</Button>
           </Animated.View>
         </Stack>
         <Animated.View
           style={{
             transform: [{ translateY: swipeAnimationError }],
             position: 'absolute',
-            top: 25,  
+            top: 25,
           }}
         >
           <Center>
@@ -212,8 +226,8 @@ const AddTodoForm: React.FC<{}> = () => {
 };
 export default AddTodoForm;
 
- const styles = StyleSheet.create({
-   submitBtn : {
-     marginBottom:10
-   }
- })
+const styles = StyleSheet.create({
+  submitBtn: {
+    marginBottom: 10,
+  },
+});

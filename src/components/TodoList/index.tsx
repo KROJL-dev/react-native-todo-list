@@ -15,24 +15,15 @@ interface IProps {
 }
 const TodoList: React.FC<IProps> = ({ todoList }) => {
   return (
-    <View
-      style={{
-         
-        height: Dimensions.get('window').height / 2+10,
-      }}
-    >
-      <Swiper
-        horizontal={true}
-        loop={false}
-        
-      >
+    <Center>
+      <Swiper horizontal={true} loop={false}>
         {todoList.map((todo) => (
-          <Center key={todo.id} >
-            <TodoCard todo={todo}  />
+          <Center key={todo.id}>
+            <TodoCard todo={todo} />
           </Center>
         ))}
       </Swiper>
-    </View>
+    </Center>
   );
 };
 export default observer(TodoList);
