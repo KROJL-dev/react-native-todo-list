@@ -1,5 +1,11 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Text, StyleSheet, Animated, TouchableOpacity } from 'react-native';
+import {
+  Text,
+  StyleSheet,
+  Animated,
+  TouchableOpacity,
+  Dimensions,
+} from 'react-native';
 import { Image, Center, Button, Flex, View } from 'native-base';
 
 import { ITodo } from '../../models/todo';
@@ -81,11 +87,13 @@ const TodoCard: React.FC<IProps> = ({ todo }) => {
 
   return (
     <Animated.View
+    
       style={{
         transform: [
           { scale: animationDelete },
           { translateY: animationCardWhenComplited },
         ],
+        
       }}
     >
       {todo.isComplited && (
@@ -167,13 +175,11 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 360,
     right: -40,
-   
   },
   card: {
-    overflow: 'visible',
     padding: 10,
-    width: 250,
-    height: 420,
+    width: Dimensions.get('window').width / 1.5,
+    height: Dimensions.get('window').height / 2,
     borderWidth: 1,
     borderStyle: 'solid',
     borderRadius: 12,
@@ -221,8 +227,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(88,157,59,0.3)',
     zIndex: 10000002222,
     position: 'absolute',
-    width: 250,
-    height: 420,
+    width: Dimensions.get('window').width / 1.5,
+    height: Dimensions.get('window').height / 2,
     borderRadius: 12,
   },
 });

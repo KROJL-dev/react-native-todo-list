@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import {LogBox, Button } from 'react-native';
+import { LogBox, Button } from 'react-native';
 
 import { observer } from 'mobx-react';
 
@@ -28,7 +28,6 @@ const App: React.FC<{}> = () => {
     }
   }, [userStore.currentUser?.userId]);
 
-  
   return (
     <NavigationContainer>
       <NativeBaseProvider>
